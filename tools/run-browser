@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+root="$(cd "$(dirname "$0")/.." && pwd)"
+url="${1:-http://shadow-cabinet-preview}"
+stage="${2:-4}"
+mkdir -p "$root/artifacts"
+docker run --rm --network ichabod-proxy --cpus=1 --memory=1g \
+ -v "$root:/app:ro" -v "$root/artifacts:/artifacts" \
+ -w /w -e NODE_PATH=/w/node_modules \
+ mcr.microsoft.com/playwright:v1.55.0-noble \
+ bash -c 'npm install --no-audit --no-fund playwright-core@1.55.0 >&2 && node /app/tools/browser-contract.cjs "$1" "$2"' _ "$url" "$stage"
