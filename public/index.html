@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171A22">
+  <title>Shadow Cabinet</title>
+  <link rel="stylesheet" href="/style.css?v=1">
+  <script type="module" src="/app.mjs?v=2"></script>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Shadow Cabinet</h1>
+      <p class="deck">A creature is hiding in the paper. Move the light.</p>
+    </header>
+    <div class="presets" role="group" aria-label="Shadow">
+      <button type="button" data-preset="rabbit" aria-pressed="true">Rabbit</button>
+      <button type="button" data-preset="moth" aria-pressed="false">Moth</button>
+      <button type="button" data-preset="teapot" aria-pressed="false">Teapot</button>
+    </div>
+    <section class="cabinet" aria-label="Shadow Cabinet">
+      <div class="paper-pane">
+        <h2>The paper</h2>
+        <div class="paper-frame"><canvas id="paper" width="720" height="600" aria-label="Paper sculpture in three dimensions"></canvas></div>
+      </div>
+      <div class="wall-pane">
+        <h2>The shadow</h2>
+        <div class="wall-frame"><canvas id="wall" width="720" height="600" aria-label="Projected shadow and lamp control"></canvas></div>
+        <p class="instruction">Drag across the lit wall to move the lamp, or use the two sliders.</p>
+        <div class="sliders">
+          <label for="lamp-x">Lamp left / right<input id="lamp-x" type="range" min="-120" max="120" step="1" value="70"></label>
+          <label for="lamp-y">Lamp up / down<input id="lamp-y" type="range" min="-80" max="80" step="1" value="-25"></label>
+        </div>
+        <div class="actions">
+          <button type="button" id="home">Bring the lamp home</button>
+          <button type="button" id="scatter">Scatter the paper</button>
+        </div>
+        <p id="status" role="status">The pieces stay still. Only the light moves.</p>
+      </div>
+    </section>
+    <details>
+      <summary>How can a mess make a rabbit?</summary>
+      <p>Each paper triangle sits somewhere along a ray between the lamp and the wall. From the lamp's home, its shadow lands on exactly the right part of the drawing. Move the lamp and pieces at different depths slide apart by different amounts. Scatter the paper to choose new depths: a different mess, the same shadow.</p>
+      <p>This is a simplified point-light model: perfectly opaque, flat triangles, a flat wall, and no soft shadow edges. The paper floats so you can see the trick.</p>
+      <p>Inspired by shadow sculptures, including the work of <a href="https://en.wikipedia.org/wiki/Tim_Noble_and_Sue_Webster">Tim Noble and Sue Webster</a>. These paper creatures are original drawings.</p>
+    </details>
+    <footer><a href="https://ichabod-crane.net/creations/">More things by Ichabod</a></footer>
+  </main>
+</body>
+</html>

@@ -2,7 +2,31 @@
 
 Move a lamp around a cabinet of scattered paper and discover the creature hiding in its shadow — then draw a shadow and turn it into a sculpture of your own.
 
-This repository currently implements the pure geometry model. The interactive paper theatre is not yet built or deployed. The original Rabbit, Moth and Teapot masks are in `fixtures/presets.json`; the full design and implementation contract is in `BRIEF.md`.
+The interactive two-view paper theatre implements Rabbit, Moth and Teapot, wall dragging, keyboard lamp sliders, a home reveal and depth scattering. Custom drawing is not yet implemented. This is a local HTTP preview, not a public deployment. The original masks are in `fixtures/presets.json`; the full design and implementation contract is in `BRIEF.md`.
+
+## Local HTTP preview
+
+The Alpine nginx image serves HTTP on port **80**. Build or rebuild after any asset change, then recreate the detached preview exactly as follows:
+
+```sh
+cd /home/ichabod/apps/shadow-cabinet
+docker build -t shadow-cabinet:preview .
+docker rm -f shadow-cabinet-preview 2>/dev/null || true
+docker run -d --name shadow-cabinet-preview --network ichabod-proxy \
+  --cpus=0.50 --memory=512m --pids-limit=256 \
+  --restart unless-stopped --log-opt max-size=10m --log-opt max-file=3 \
+  shadow-cabinet:preview
+```
+
+There are no Traefik routing labels and no published host port. The image has a real `/healthz` HTTP healthcheck using Alpine's `wget`. Check readiness before using the browser contract:
+
+```sh
+docker exec shadow-cabinet-preview wget -qO- http://127.0.0.1:80/healthz
+docker inspect --format '{{.State.Health.Status}}' shadow-cabinet-preview
+tools/run-browser http://shadow-cabinet-preview 2
+```
+
+Expected outputs: `ok`, `healthy`, and `browser stage 2 pass`. The browser runs on `ichabod-proxy` and reaches the preview by its container name. The app fetches only its bundled local mask fixture; it uses no external runtime assets. The read-only `window.shadowCabinet.snapshot()` reports fresh copies of current geometry and projections for inspection.
 
 ## Model
 
