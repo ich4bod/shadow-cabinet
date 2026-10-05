@@ -291,6 +291,8 @@ document.querySelector('#home').addEventListener('click', () => {
 });
 document.querySelector('#scatter').addEventListener('click', () => {
   // Scattering changes only the paper depths, never the mask or current lamp.
+  // Freeze an in-flight home reveal at its current light before changing paper.
+  glide = null;
   seed += 1;
   tiles = makeTiles(rows, seed);
   scheduleDraw();
