@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#171A22">
   <title>Shadow Cabinet</title>
-  <link rel="stylesheet" href="/style.css?v=1">
-  <script type="module" src="/app.mjs?v=2"></script>
+  <link rel="stylesheet" href="/style.css?v=2">
+  <script type="module" src="/app.mjs?v=3"></script>
 </head>
 <body>
   <main>
@@ -18,6 +18,8 @@
       <button type="button" data-preset="rabbit" aria-pressed="true">Rabbit</button>
       <button type="button" data-preset="moth" aria-pressed="false">Moth</button>
       <button type="button" data-preset="teapot" aria-pressed="false">Teapot</button>
+      <button type="button" id="open-maker">Cut your own</button>
+      <span id="custom-name" hidden>Your shadow</span>
     </div>
     <section class="cabinet" aria-label="Shadow Cabinet">
       <div class="paper-pane">
@@ -39,6 +41,21 @@
         <p id="status" role="status">The pieces stay still. Only the light moves.</p>
       </div>
     </section>
+    <dialog id="maker" aria-labelledby="maker-title" aria-describedby="maker-instruction">
+      <h2 id="maker-title">Make a shadow</h2>
+      <p id="maker-instruction">Draw on the squares. Your dark marks will become scattered paper.</p>
+      <div class="maker-modes">
+        <button type="button" id="draw-mode" aria-pressed="true" autofocus>Draw</button>
+        <button type="button" id="erase-mode" aria-pressed="false">Erase</button>
+        <button type="button" id="clear-drawing">Clear</button>
+      </div>
+      <canvas id="drawing" width="480" height="480" aria-label="Shadow drawing, 24 by 24 squares"></canvas>
+      <p id="drawing-status" role="status">Draw a little darkness first.</p>
+      <div class="maker-actions">
+        <button type="button" id="make-sculpture" disabled>Make a sculpture</button>
+        <button type="button" id="cancel-maker">Cancel</button>
+      </div>
+    </dialog>
     <details>
       <summary>How can a mess make a rabbit?</summary>
       <p>Each paper triangle sits somewhere along a ray between the lamp and the wall. From the lamp's home, its shadow lands on exactly the right part of the drawing. Move the lamp and pieces at different depths slide apart by different amounts. Scatter the paper to choose new depths: a different mess, the same shadow.</p>

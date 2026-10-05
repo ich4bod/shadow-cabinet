@@ -2,7 +2,7 @@
 
 Move a lamp around a cabinet of scattered paper and discover the creature hiding in its shadow — then draw a shadow and turn it into a sculpture of your own.
 
-The interactive two-view paper theatre implements Rabbit, Moth and Teapot, wall dragging, keyboard lamp sliders, a home reveal and depth scattering. Custom drawing is not yet implemented. This is a local HTTP preview, not a public deployment. The original masks are in `fixtures/presets.json`; the full design and implementation contract is in `BRIEF.md`.
+The interactive two-view paper theatre implements Rabbit, Moth and Teapot, wall dragging, keyboard lamp sliders, a home reveal and depth scattering. Cut your own opens a fresh 24×24 pad: Draw/Erase strokes cross every traversed cell, Clear resets the draft, and Make turns it into the same depth-scattered geometry at the home lamp. Cancel or Escape leaves the previous sculpture unchanged. Custom shadows can be scattered too; switching presets intentionally discards them. This is a local HTTP preview, not a public deployment. The original masks are in `fixtures/presets.json`; the full design and implementation contract is in `BRIEF.md`.
 
 ## Local HTTP preview
 
@@ -23,10 +23,10 @@ There are no Traefik routing labels and no published host port. The image has a 
 ```sh
 docker exec shadow-cabinet-preview wget -qO- http://127.0.0.1:80/healthz
 docker inspect --format '{{.State.Health.Status}}' shadow-cabinet-preview
-tools/run-browser http://shadow-cabinet-preview 2
+tools/run-browser http://shadow-cabinet-preview 3
 ```
 
-Expected outputs: `ok`, `healthy`, and `browser stage 2 pass`. The browser runs on `ichabod-proxy` and reaches the preview by its container name. The app fetches only its bundled local mask fixture; it uses no external runtime assets. The read-only `window.shadowCabinet.snapshot()` reports fresh copies of current geometry and projections for inspection.
+Expected outputs: `ok`, `healthy`, and `browser stage 3 pass`. The browser runs on `ichabod-proxy` and reaches the preview by its container name. The app fetches only its bundled local mask fixture; it uses no external runtime assets. The read-only `window.shadowCabinet.snapshot()` reports fresh copies of current geometry and projections for inspection.
 
 ## Model
 

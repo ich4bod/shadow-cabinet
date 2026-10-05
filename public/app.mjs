@@ -10,6 +10,121 @@ const xRange = document.querySelector('#lamp-x');
 const yRange = document.querySelector('#lamp-y');
 const status = document.querySelector('#status');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+const maker = document.querySelector('#maker');
+const drawing = document.querySelector('#drawing');
+const openMaker = document.querySelector('#open-maker');
+const makeSculpture = document.querySelector('#make-sculpture');
+const drawingStatus = document.querySelector('#drawing-status');
+let draft = [];
+let drawingMode = 'draw';
+let drawingPointer = null;
+let lastDrawingPoint = null;
+let pendingDrawingFrame = 0;
+
+function setDrawingMode(mode) {
+  drawingMode = mode;
+  document.querySelector('#draw-mode').setAttribute('aria-pressed', String(mode === 'draw'));
+  document.querySelector('#erase-mode').setAttribute('aria-pressed', String(mode === 'erase'));
+}
+function resetDraft() {
+  draft = Array.from({ length: 24 }, () => Array(24).fill(false));
+  stopDrawing();
+  updateDraft();
+}
+function updateDraft() {
+  const empty = !draft.some((row) => row.some(Boolean));
+  makeSculpture.disabled = empty;
+  drawingStatus.textContent = empty ? 'Draw a little darkness first.' : '';
+  if (!pendingDrawingFrame) pendingDrawingFrame = requestAnimationFrame(paintDrawing);
+}
+function paintDrawing() {
+  pendingDrawingFrame = 0;
+  const ctx = drawing.getContext('2d');
+  ctx.fillStyle = '#F4E5C6';
+  ctx.fillRect(0, 0, 480, 480);
+  ctx.fillStyle = '#24202A';
+  draft.forEach((row, r) => row.forEach((filled, c) => {
+    if (filled) ctx.fillRect(c * 20, r * 20, 20, 20);
+  }));
+  ctx.beginPath();
+  for (let i = 0; i <= 24; i += 1) {
+    ctx.moveTo(i * 20, 0); ctx.lineTo(i * 20, 480);
+    ctx.moveTo(0, i * 20); ctx.lineTo(480, i * 20);
+  }
+  ctx.strokeStyle = '#B8795355';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+}
+function drawingPoint(event) {
+  const box = drawing.getBoundingClientRect();
+  return [Math.max(0, Math.min(479.999, (event.clientX - box.left) / box.width * 480)),
+    Math.max(0, Math.min(479.999, (event.clientY - box.top) / box.height * 480))];
+}
+// Traverse grid boundaries along the actual segment, even if a fast pointer
+// only delivered its endpoints. Exact corner crossings enter the diagonal cell.
+function paintSegment(from, to) {
+  let col = Math.floor(from[0] / 20);
+  let row = Math.floor(from[1] / 20);
+  const endCol = Math.floor(to[0] / 20);
+  const endRow = Math.floor(to[1] / 20);
+  const dx = to[0] - from[0], dy = to[1] - from[1];
+  const sx = Math.sign(dx), sy = Math.sign(dy);
+  const txStep = dx === 0 ? Infinity : 20 / Math.abs(dx);
+  const tyStep = dy === 0 ? Infinity : 20 / Math.abs(dy);
+  let tx = dx === 0 ? Infinity : ((col + (sx > 0 ? 1 : 0)) * 20 - from[0]) / dx;
+  let ty = dy === 0 ? Infinity : ((row + (sy > 0 ? 1 : 0)) * 20 - from[1]) / dy;
+  draft[row][col] = drawingMode === 'draw';
+  while (col !== endCol || row !== endRow) {
+    if (tx < ty) { col += sx; tx += txStep; }
+    else if (ty < tx) { row += sy; ty += tyStep; }
+    else { col += sx; row += sy; tx += txStep; ty += tyStep; }
+    draft[row][col] = drawingMode === 'draw';
+  }
+  updateDraft();
+}
+function continueDrawing(event) {
+  const point = drawingPoint(event);
+  paintSegment(lastDrawingPoint || point, point);
+  lastDrawingPoint = point;
+}
+function stopDrawing() {
+  const pointer = drawingPointer;
+  drawingPointer = null;
+  lastDrawingPoint = null;
+  if (pointer !== null && drawing.hasPointerCapture(pointer)) drawing.releasePointerCapture(pointer);
+}
+drawing.addEventListener('pointerdown', (event) => {
+  if (event.button !== 0 || drawingPointer !== null) return;
+  drawingPointer = event.pointerId;
+  drawing.setPointerCapture(event.pointerId);
+  continueDrawing(event);
+});
+drawing.addEventListener('pointermove', (event) => {
+  if (event.pointerId === drawingPointer) continueDrawing(event);
+});
+drawing.addEventListener('pointerup', (event) => {
+  if (event.pointerId !== drawingPointer) return;
+  continueDrawing(event);
+  stopDrawing();
+});
+drawing.addEventListener('pointercancel', (event) => {
+  if (event.pointerId === drawingPointer) stopDrawing();
+});
+drawing.addEventListener('lostpointercapture', stopDrawing);
+openMaker.addEventListener('click', () => {
+  resetDraft();
+  setDrawingMode('draw');
+  maker.showModal();
+});
+document.querySelector('#draw-mode').addEventListener('click', () => setDrawingMode('draw'));
+document.querySelector('#erase-mode').addEventListener('click', () => setDrawingMode('erase'));
+document.querySelector('#clear-drawing').addEventListener('click', resetDraft);
+document.querySelector('#cancel-maker').addEventListener('click', () => maker.close());
+// Native Escape closes the dialog without touching the existing sculpture.
+maker.addEventListener('close', () => {
+  stopDrawing();
+  openMaker.focus();
+});
 let preset = 'rabbit';
 let seed = 1;
 let rows = [...presets.find((item) => item.id === preset).rows];
@@ -28,6 +143,7 @@ function syncControls() {
   for (const button of document.querySelectorAll('[data-preset]')) {
     button.setAttribute('aria-pressed', String(button.dataset.preset === preset));
   }
+  document.querySelector('#custom-name').hidden = preset !== 'custom';
 }
 
 function scheduleDraw() {
@@ -188,6 +304,15 @@ for (const button of document.querySelectorAll('[data-preset]')) {
     setLamp(70, -25);
   });
 }
+makeSculpture.addEventListener('click', () => {
+  if (makeSculpture.disabled) return;
+  rows = draft.map((row) => row.map((filled) => filled ? '#' : '.').join(''));
+  preset = 'custom';
+  seed = 1;
+  tiles = makeTiles(rows, seed);
+  setLamp(HOME[0], HOME[1]);
+  maker.close();
+});
 reducedMotion.addEventListener('change', () => {
   if (reducedMotion.matches && glide) setLamp(0, 0);
 });

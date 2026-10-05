@@ -17,7 +17,7 @@ button[aria-pressed="true"] { color: var(--background); background: var(--cream)
 .paper-frame { background: var(--interior); }
 .wall-frame { background: var(--cream); box-shadow: 0 0 34px #F4E5C619; }
 canvas { display: block; width: 100%; height: auto; aspect-ratio: 6 / 5; }
-#wall { touch-action: none; cursor: crosshair; }
+#wall, #drawing { touch-action: none; cursor: crosshair; }
 .instruction { color: var(--muted); margin: 16px 0 10px; }
 .sliders { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 label { display: block; }
@@ -31,6 +31,15 @@ summary { cursor: pointer; min-height: 44px; padding: 12px 0; color: var(--cream
 details p { margin: 6px 0 16px; }
 a { color: var(--cream); text-underline-offset: 4px; }
 footer { margin-top: 20px; padding-top: 12px; font-size: 14px; }
+#custom-name { align-self: center; padding: 10px 0; }
+#maker { width: min(544px, calc(100% - 24px)); max-height: calc(100dvh - 24px); padding: 20px; border: 1px solid #D1AA77; border-radius: 10px; background: var(--interior); color: var(--cream); overflow: auto; }
+#maker::backdrop { background: #171A22CC; }
+#maker-instruction { margin: 0 0 12px; color: var(--muted); }
+.maker-modes, .maker-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.maker-modes { margin-bottom: 12px; }
+#drawing { width: min(100%, 480px, 48dvh); margin: auto; aspect-ratio: 1; background: var(--cream); border: 1px solid #D1AA77; border-radius: 4px; cursor: crosshair; }
+#drawing-status { min-height: 1.5em; margin: 10px 0; color: var(--muted); }
+button:disabled { opacity: .5; cursor: not-allowed; }
 @media (max-width: 700px) {
   main { padding: 22px 16px 20px; }
   h1 { font-size: 30px; }
