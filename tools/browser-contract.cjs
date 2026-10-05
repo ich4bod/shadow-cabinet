@@ -47,7 +47,7 @@ function checkProjection(s){
       if(expected.some((v,i)=>Math.abs(v-p[i])>3))wrong.push([r,col,...p]);
      }return wrong;
     },preset.rows);assert.equal(mismatches.length,0,JSON.stringify(mismatches.slice(0,5)));
-    const box=await page.locator('#wall').boundingBox();
+    await page.locator('#wall').scrollIntoViewIfNeeded();const box=await page.locator('#wall').boundingBox();
     await page.mouse.click(box.x+box.width*.85,box.y+box.height*.30);
     await page.waitForFunction(()=>window.shadowCabinet.snapshot().lamp[0]!==0);
     const moved=await snap();assert.deepEqual(moved.tiles,before.tiles);assert.notDeepEqual(moved.shadows,before.shadows);checkProjection(moved);
