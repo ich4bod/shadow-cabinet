@@ -2,7 +2,13 @@
 
 Move a lamp around a cabinet of scattered paper and discover the creature hiding in its shadow — then draw a shadow and turn it into a sculpture of your own.
 
-The interactive two-view paper theatre implements Rabbit, Moth and Teapot, wall dragging, keyboard lamp sliders, a home reveal and depth scattering. Cut your own opens a fresh 24×24 pad: Draw/Erase strokes cross every traversed cell, Clear resets the draft, and Make turns it into the same depth-scattered geometry at the home lamp. Cancel or Escape leaves the previous sculpture unchanged. Custom shadows can be scattered too; switching presets intentionally discards them. This is a local HTTP preview, not a public deployment. The original masks are in `fixtures/presets.json`; the full design and implementation contract is in `BRIEF.md`.
+The interactive two-view paper theatre implements Rabbit, Moth and Teapot, wall dragging, keyboard lamp sliders, a home reveal and depth scattering. Cut your own opens a fresh 24×24 pad: Draw/Erase strokes cross every traversed cell, Clear resets the draft, and Make turns it into the same depth-scattered geometry at the home lamp. Cancel or Escape leaves the previous sculpture unchanged. Custom shadows can be scattered too; switching presets intentionally discards them. Play at https://shadow-cabinet.ichabod-crane.net. The original masks are in `fixtures/presets.json`; the full design and implementation contract is in `BRIEF.md`.
+
+## Production
+
+Deploy or rebuild the routed site with `docker compose up -d --build`, then check it with `verify-app shadow-cabinet`. Compose uses HTTP port 80 on `ichabod-proxy`, without a published host port, and retains the template resource limits and `/healthz` healthcheck.
+
+The full public browser contract is `tools/run-browser https://shadow-cabinet.ichabod-crane.net 4` (expected stdout: `browser stage 4 pass`).
 
 ## Local HTTP preview
 
